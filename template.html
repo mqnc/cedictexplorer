@@ -1,0 +1,263 @@
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<meta name="description" content="Explorer for Chinese language">
+<meta name="author" content="mqnc">
+<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC&display=swap" rel="stylesheet">
+
+<title>CEDICT Explorer</title>
+
+<style>
+	body{
+		background-color:beige;
+	}
+	div{
+		display:inline;
+	}
+	body,td,input,button{
+		font-family: 'Noto Serif TC', serif;
+		font-size:16pt;
+	}
+	td{
+		padding:12px;
+		box-shadow: 0px 0px 2px 1px sienna;
+		text-align:center;
+		background-color:white;
+	}
+	table{
+		border-spacing:4px;
+	}
+	td.mean{
+		text-align:left;
+	}
+	ul{
+		margin:0;
+	}
+	.trad{
+		display:var(--displaytrad);
+	}
+	.simp{
+		display:var(--displaysimp);
+	}
+	.big{
+		font-size:50pt;
+	}
+	.match{
+		text-shadow: 1px 1px 4px orange, 1px 1px 10px orange;
+		background-color:beige;
+		box-shadow: 0px 0px 2px 0px sandybrown;
+	}
+	.mean.match{
+		pointer-events:none;
+	}
+	.char{
+		width:25%;
+	}
+	.pron{
+		width:25%;
+		word-spacing:6pt;
+	}
+	.click{
+		cursor:pointer;
+	}
+	#header{
+		position:fixed;
+		top:5px;
+		width:100%;
+		text-align:center;
+	}
+	#menu{
+		background-color:white;
+		border:solid 12px white;
+		box-shadow: 0px 0px 2px 1px sienna;
+	}
+	#display{
+		width:100%;
+	}
+</style>
+
+<script src="cedict.js" charset="utf-8"></script>
+
+</head>
+<body>
+
+<div id="header">
+	<div id="menu">
+		<input id="searchBar" value="example" onkeyup="typed(event)">
+		<button onclick="flip(-1)">&lt;</button>
+		<div id="pageCount"></div>
+		<button onclick="flip(1)">&gt;</button>
+		<button id="tsToggle" onclick="switchTraditional()"></button>
+	</div>
+</div>
+
+<br>
+<br>
+
+<table id="display"></table>
+
+<script>
+
+useTraditional = false
+// switch between traditional and simplified Chinese
+function switchTraditional(){
+	useTraditional = !useTraditional
+	if(useTraditional){
+		document.getElementById("tsToggle").innerHTML =
+				"&nbsp;<u>traditional</u>&#8202;&#8202;/&#8202;&#8202;simplified&nbsp;"
+		document.documentElement.style.setProperty('--displaytrad', "inline")
+		document.documentElement.style.setProperty('--displaysimp', "none")
+	}
+	else{
+		document.getElementById("tsToggle").innerHTML =
+				"&nbsp;traditional&#8202;&#8202;/&#8202;&#8202;<u>simplified</u>&nbsp;"
+		document.documentElement.style.setProperty('--displaytrad', "none")
+		document.documentElement.style.setProperty('--displaysimp', "inline")
+	}
+}
+switchTraditional()
+
+// callback to trigger a search when enter was pressed in the search bar
+function typed(event){
+	if(event.keyCode == 13){search()}
+}
+
+matches = [] // list of matched entries
+pattern = "" // search pattern that was entered
+page = 0 // active page
+
+// highlight matches within string
+function highlight(str){
+	return str.replace(pattern, function(x){return "<div class='match'>" + x + "</div>"})
+}
+
+// make Chinese letters clickable
+function linkify(str, eachLetter=false){
+	// for Chinese characters within the meaning texts, indicated by ascii
+	// device codes that were placed by the python script
+	if(!eachLetter){
+		str = str.replace(/\u{11}/gu, '<div class="trad click" onclick="clicked(event)">')
+		str = str.replace(/\u{12}/gu, '<div class="simp click" onclick="clicked(event)">')
+		str = str.replace(/\u{13}/gu, '<div class="both click" onclick="clicked(event)">')
+		str = str.replace(/\u{14}/gu, '</div>')
+		return str
+	}
+	// make each individual character clickable, for the big display
+	else{
+		return str.replace(/(?<!<\/?[^>]*|&[^;]*)((?!<).)/gu, function(x){ // match any character outside html tags
+			return '<div class="click" onclick="clicked(event)">' + x + '</div><wbr>'
+		})
+	}
+}
+
+// flip the page
+function flip(direction){
+	perpage = 100 // entries per page
+	pages = Math.ceil(matches.length/perpage)
+	page += direction
+	if(page < 0){page = 0}
+	if(page > pages-1){page = pages-1}
+
+	display = document.getElementById("display")
+	display.innerHTML = ""
+
+	for(iMatch=page*perpage; iMatch<(page+1)*perpage; iMatch++){
+		if(iMatch>=matches.length){
+			break
+		}
+
+		// element 0 stores entry index, element 1 stores ranking score
+		iEntry = matches[iMatch][0]
+
+		var row = ""
+		row += "<tr><td class='char'><div class='trad big'>" + linkify(highlight(traditional[iEntry]), true) + "</div>"
+		row += "<div class='simp big'>" + linkify(highlight(simplified[iEntry]), true) + "</div></td>"
+		row += "<td class='pron'>" + highlight(zhuyin[iEntry]) + "<br>" + highlight(pinyin[iEntry]) + "</td>"
+		row += "<td class='mean'><ul>"
+		for(var iMeaning=0; iMeaning<meanings[iEntry].length; iMeaning++){
+			row += "<li>" + linkify(highlight(meanings[iEntry][iMeaning])) + "</li>"
+		}
+ 		row += "</ul></td></tr>"
+
+		display.innerHTML += row
+	}
+
+	document.getElementById("pageCount").innerHTML = (page+1) + "&thinsp;/&thinsp;" + pages
+}
+
+// rate how well the search pattern matches a given string
+// mainly the ratio between matched string length and total string length
+// slightly reduced by stringlength so "a" matches "a" better than "aa"
+// also reduced by match position so "a" matches "ab" better than "ba"
+function score(str){
+	var originalLen = str.length
+	var restLen = str.replace(pattern, "").length
+	var matchLen = originalLen - restLen
+	var match = pattern.exec(str)
+	var pos = 0
+	if(match!=null){pos = match.index}
+	var res = 100*(matchLen/originalLen) - originalLen/1000.0 - pos/2000.0
+	if(res<0){res=0}
+	return res
+}
+
+// main function of this whole thing, search the pattern in the data base
+function search(){
+	term = document.getElementById("searchBar").value
+
+	matches = []
+	pattern = new RegExp(term, "giu")
+	page = 0
+	window.scrollTo(0,0);
+
+	// go through all entries and rate how well they match the search
+	for(var iEntry=0; iEntry<meanings.length; iEntry++){
+
+		// rate each field
+		scores = []
+
+		scores.push(score(traditional[iEntry]))
+		scores.push(score(simplified[iEntry]))
+		scores.push(score(zhuyin[iEntry]))
+		scores.push(score(pinyin[iEntry]))
+
+		for(var j=0; j<meanings[iEntry].length; j++){
+			scores.push(score(meanings[iEntry][j]) - j)
+		}
+
+		// combine score for one entry:
+		// sort them, then compute
+		// highest + 2nd highest*0.1 + 3rd highest*0.01 ...
+		scores.sort(function(a,b){return b-a})
+
+		var scoreSum = 0
+		for(j=0; j<scores.length; j++){
+			scoreSum += scores[j] * Math.pow(10.0, -j)
+		}
+
+		// if the search term did not show up at all, don't list entry in the matches
+		if(scoreSum > 0){
+			matches.push([iEntry, scoreSum])
+		}
+	}
+
+	// sort list of matches by score
+	matches.sort(function(a,b){return b[1]-a[1]})
+
+	// update result list
+	flip(0)
+}
+search()
+
+// if a Chinese character/word was clicked, search for it
+function clicked(event){
+	content = event.target.innerHTML
+	content = content.replace(/(<([^>]+)>)/ig, "") // strip highlight html
+	document.getElementById("searchBar").value = content
+	search()
+}
+
+</script>
+</body>
+</html>
