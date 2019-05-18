@@ -13,10 +13,20 @@
 		src: url('twkai98min.ttf');
 	}
 	:root {
+		/* all values will be set by js */
 		--chineseFont:sans-serif;
+		--displaytrad:none;
+		--displaysimp:none;
+		--bodybg:white;
+		--cellbg:white;
+		--cellshadow:black;
+		--textcolor:black;
+		--markglow:red;
+		--markbg:red;
+		--markbox:red;
 	}
 	body{
-		background-color:beige;
+		background-color:var(--bodybg);
 	}
 	div{
 		display:inline;
@@ -25,12 +35,14 @@
 		font-family:var(--chineseFont);
 		font-size:16pt;
 		line-height:20pt;
+		color:var(--textcolor);
+		background-color:var(--cellbg);
 	}
 	td{
 		padding:12px;
-		box-shadow: 0px 0px 2px 1px sienna;
+		box-shadow: 0px 0px 2px 1px var(--cellshadow);
 		text-align:center;
-		background-color:white;
+		background-color:var(--cellbg);
 	}
 	table{
 		border-spacing:4px;
@@ -52,9 +64,9 @@
 		line-height:56pt;
 	}
 	.match{
-		text-shadow: 1px 1px 4px orange, 1px 1px 10px orange;
-		background-color:beige;
-		box-shadow: 0px 0px 2px 0px sandybrown;
+		text-shadow: 1px 1px 4px var(--markglow), 1px 1px 10px var(--markglow);
+		background-color:var(--markbg);
+		box-shadow: 0px 0px 2px 0px var(--markbox);
 	}
 	.mean.match{
 		pointer-events:none;
@@ -76,15 +88,15 @@
 		text-align:center;
 	}
 	#menu{
-		background-color:white;
-		border:solid 12px white;
-		box-shadow: 0px 0px 2px 1px sienna;
+		background-color:var(--cellbg);
+		border:solid 12px var(--cellbg);
+		box-shadow: 0px 0px 2px 1px var(--cellshadow);
 	}
 	#display{
 		width:100%;
 	}
 	.underlined{
-		border-bottom:solid 2px black;
+		border-bottom:solid 2px var(--textcolor);
 	}
 </style>
 
@@ -102,9 +114,10 @@
 		<button id="tsToggle" onclick="switchTraditional()"></button>
 		<button id="fontToggle" onclick="switchFont()">
 			<div id="noCalli" class="underlined" style="font-family:serif; font-size:13pt">中</div>
-			<div id="calli"><img src="zhong.svg" style="height:13pt"></div>
+			<div id="calli"><img src="zhong.svg" style="height:13pt; background-color:beige"></div>
 			<div id="warning">(27MB)</div>
 		</button>
+		<button onclick="switchDark()">◑</button>
 	</div>
 </div>
 
@@ -150,6 +163,31 @@ function switchFont(){
 		document.getElementById("calli").classList.remove("underlined");
 	}
 }
+
+darkMode = false
+// switch between bright and dark layout for learning Chinese all night long
+function switchDark(){
+	darkMode = !darkMode
+	if(!darkMode){
+		document.documentElement.style.setProperty('--bodybg', "beige")
+		document.documentElement.style.setProperty('--cellbg', "white")
+		document.documentElement.style.setProperty('--cellshadow', "sienna")
+		document.documentElement.style.setProperty('--textcolor', "black")
+		document.documentElement.style.setProperty('--markglow', "orange")
+		document.documentElement.style.setProperty('--markbg', "beige")
+		document.documentElement.style.setProperty('--markbox', "sandybrown")
+	}
+	else{
+		document.documentElement.style.setProperty('--bodybg', "#502010")
+		document.documentElement.style.setProperty('--cellbg', "black")
+		document.documentElement.style.setProperty('--cellshadow', "gray")
+		document.documentElement.style.setProperty('--textcolor', "beige")
+		document.documentElement.style.setProperty('--markglow', "#ff6010")
+		document.documentElement.style.setProperty('--markbg', "#603020")
+		document.documentElement.style.setProperty('--markbox', "sandybrown")
+	}
+}
+switchDark()
 
 // callback to trigger a search when enter was pressed in the search bar
 function typed(event){
