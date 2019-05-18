@@ -4,11 +4,17 @@
 <meta charset="utf-8">
 <meta name="description" content="Explorer for Chinese language">
 <meta name="author" content="mqnc">
-<link href="https://fonts.googleapis.com/css?family=Noto+Serif+TC&display=swap" rel="stylesheet">
 
 <title>CEDICT Explorer</title>
 
 <style>
+	@font-face {
+		font-family: 'twkai';
+		src: url('twkai98min.ttf');
+	}
+	:root {
+		--chineseFont:sans-serif;
+	}
 	body{
 		background-color:beige;
 	}
@@ -16,7 +22,7 @@
 		display:inline;
 	}
 	body,td,input,button{
-		font-family: 'Noto Serif TC', serif;
+		font-family:var(--chineseFont);
 		font-size:16pt;
 	}
 	td{
@@ -75,6 +81,9 @@
 	#display{
 		width:100%;
 	}
+	.underlined{
+		border-bottom:solid 2px black;
+	}
 </style>
 
 <script src="cedict.js" charset="utf-8"></script>
@@ -84,11 +93,16 @@
 
 <div id="header">
 	<div id="menu">
-		<input id="searchBar" value="example" onkeyup="typed(event)">
+		<input id="searchBar" style="width:30%" value="example" onkeyup="typed(event)">
 		<button onclick="flip(-1)">&lt;</button>
 		<div id="pageCount"></div>
 		<button onclick="flip(1)">&gt;</button>
 		<button id="tsToggle" onclick="switchTraditional()"></button>
+		<button id="fontToggle" onclick="switchFont()">
+			<div id="noCalli" class="underlined" style="font-family:serif; font-size:13pt">中</div>
+			<div id="calli"><img src="zhong.svg" style="height:13pt"></div>
+			<div id="warning">(27MB)</div>
+		</button>
 	</div>
 </div>
 
@@ -105,18 +119,35 @@ function switchTraditional(){
 	useTraditional = !useTraditional
 	if(useTraditional){
 		document.getElementById("tsToggle").innerHTML =
-				"&nbsp;<u>traditional</u>&#8202;&#8202;/&#8202;&#8202;simplified&nbsp;"
+				"&nbsp;<u>繁</u> 简&nbsp;"
 		document.documentElement.style.setProperty('--displaytrad', "inline")
 		document.documentElement.style.setProperty('--displaysimp', "none")
 	}
 	else{
 		document.getElementById("tsToggle").innerHTML =
-				"&nbsp;traditional&#8202;&#8202;/&#8202;&#8202;<u>simplified</u>&nbsp;"
+				"&nbsp;繁 <u>简</u>&nbsp;"
 		document.documentElement.style.setProperty('--displaytrad', "none")
 		document.documentElement.style.setProperty('--displaysimp', "inline")
 	}
 }
 switchTraditional()
+
+useCalligraphy = false
+// switch between ugly system font and beautiful Taiwanese government font
+function switchFont(){
+	useCalligraphy = !useCalligraphy
+	document.getElementById("warning").innerHTML = ""
+	if(useCalligraphy){
+		document.documentElement.style.setProperty('--chineseFont', "twkai, serif")
+		document.getElementById("noCalli").classList.remove("underlined");
+		document.getElementById("calli").classList.add("underlined");
+	}
+	else{
+		document.documentElement.style.setProperty('--chineseFont', "sans-serif")
+		document.getElementById("noCalli").classList.add("underlined");
+		document.getElementById("calli").classList.remove("underlined");
+	}
+}
 
 // callback to trigger a search when enter was pressed in the search bar
 function typed(event){

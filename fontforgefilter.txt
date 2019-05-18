@@ -1,0 +1,3 @@
+Select("u02c7", "u02c7", "u02ca", "u02cb", "u02d9", "u02d9", "u3105", "u3129", "u4e00", "uffff")
+SelectInvert()
+DetachAndRemoveGlyphs()
