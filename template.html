@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
 <meta charset="utf-8">
 <meta name="description" content="Explorer for Chinese language">
 <meta name="author" content="mqnc">
@@ -109,8 +108,9 @@
 		<button onclick="flip(-1)">&lt;</button>
 		<div id="pageCount"></div>
 		<button onclick="flip(1)">&gt;</button>
+		<button onclick="wiki()">wiki</button>
 		<button id="tsToggle" onclick="switchTraditional()"></button>
-		<button id="fontToggle" onclick="switchFont()">☐ callig (27MB)</button>
+		<button id="fontToggle" onclick="switchFont()">☐&#xFE0E; callig (27MB)</button>
 		<button onclick="switchDark()">◑</button>
 	</div>
 </div>
@@ -121,62 +121,6 @@
 <table id="display"></table>
 
 <script>
-
-useTraditional = false
-// switch between traditional and simplified Chinese
-function switchTraditional(){
-	useTraditional = !useTraditional
-	if(useTraditional){
-		document.getElementById("tsToggle").innerHTML = "☐ simp"
-		document.documentElement.style.setProperty('--displaytrad', "inline")
-		document.documentElement.style.setProperty('--displaysimp', "none")
-	}
-	else{
-		document.getElementById("tsToggle").innerHTML = "☑ simp"
-		document.documentElement.style.setProperty('--displaytrad', "none")
-		document.documentElement.style.setProperty('--displaysimp', "inline")
-	}
-}
-switchTraditional()
-
-useCalligraphy = false
-// switch between ugly system font and beautiful Taiwanese government font
-function switchFont(){
-	useCalligraphy = !useCalligraphy
-	if(useCalligraphy){
-		document.getElementById("fontToggle").innerHTML = "☑ callig"
-		document.documentElement.style.setProperty('--chineseFont', "twkai, serif")
-	}
-	else{
-		document.getElementById("fontToggle").innerHTML = "☐ callig"
-		document.documentElement.style.setProperty('--chineseFont', "sans-serif")
-	}
-}
-
-darkMode = true
-// switch between bright and dark layout for learning Chinese all night long
-function switchDark(){
-	darkMode = !darkMode
-	if(!darkMode){
-		document.documentElement.style.setProperty('--bodybg', "beige")
-		document.documentElement.style.setProperty('--cellbg', "white")
-		document.documentElement.style.setProperty('--cellshadow', "sienna")
-		document.documentElement.style.setProperty('--textcolor', "black")
-		document.documentElement.style.setProperty('--markglow', "orange")
-		document.documentElement.style.setProperty('--markbg', "beige")
-		document.documentElement.style.setProperty('--markbox', "sandybrown")
-	}
-	else{
-		document.documentElement.style.setProperty('--bodybg', "#502010")
-		document.documentElement.style.setProperty('--cellbg', "black")
-		document.documentElement.style.setProperty('--cellshadow', "gray")
-		document.documentElement.style.setProperty('--textcolor', "beige")
-		document.documentElement.style.setProperty('--markglow', "#ff6010")
-		document.documentElement.style.setProperty('--markbg', "#603020")
-		document.documentElement.style.setProperty('--markbox', "sandybrown")
-	}
-}
-switchDark()
 
 // callback to trigger a search when enter was pressed in the search bar
 function typed(event){
@@ -318,6 +262,67 @@ function clicked(event){
 	document.getElementById("searchBar").value = content
 	search()
 }
+
+function wiki(){
+	window.open("https://en.wiktionary.org/wiki/" + document.getElementById("searchBar").value)
+}
+
+useTraditional = false
+// switch between traditional and simplified Chinese
+function switchTraditional(){
+	useTraditional = !useTraditional
+	if(useTraditional){
+		document.getElementById("tsToggle").innerHTML = "☐&#xFE0E; simp"
+		document.documentElement.style.setProperty('--displaytrad', "inline")
+		document.documentElement.style.setProperty('--displaysimp', "none")
+	}
+	else{
+		document.getElementById("tsToggle").innerHTML = "☑&#xFE0E; simp"
+		document.documentElement.style.setProperty('--displaytrad', "none")
+		document.documentElement.style.setProperty('--displaysimp', "inline")
+	}
+}
+switchTraditional()
+
+useCalligraphy = false
+// switch between ugly system font and beautiful Taiwanese government font
+function switchFont(){
+	useCalligraphy = !useCalligraphy
+	if(useCalligraphy){
+		document.getElementById("fontToggle").innerHTML = "☑&#xFE0E; callig"
+		document.documentElement.style.setProperty('--chineseFont', "twkai, serif")
+	}
+	else{
+		document.getElementById("fontToggle").innerHTML = "☐&#xFE0E; callig"
+		document.documentElement.style.setProperty('--chineseFont', "sans-serif")
+	}
+}
+
+darkMode = true
+// switch between bright and dark layout for learning Chinese all night long
+function switchDark(){
+	darkMode = !darkMode
+	if(!darkMode){
+		document.documentElement.style.setProperty('--bodybg', "beige")
+		document.documentElement.style.setProperty('--cellbg', "white")
+		document.documentElement.style.setProperty('--cellshadow', "sienna")
+		document.documentElement.style.setProperty('--textcolor', "black")
+		document.documentElement.style.setProperty('--markglow', "orange")
+		document.documentElement.style.setProperty('--markbg', "beige")
+		document.documentElement.style.setProperty('--markbox', "sandybrown")
+	}
+	else{
+		document.documentElement.style.setProperty('--bodybg', "#502010")
+		document.documentElement.style.setProperty('--cellbg', "black")
+		document.documentElement.style.setProperty('--cellshadow', "gray")
+		document.documentElement.style.setProperty('--textcolor', "beige")
+		document.documentElement.style.setProperty('--markglow', "#ff6010")
+		document.documentElement.style.setProperty('--markbg', "#603020")
+		document.documentElement.style.setProperty('--markbox', "sandybrown")
+	}
+}
+switchDark()
+
 
 </script>
 </body>
