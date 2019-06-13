@@ -2,14 +2,14 @@
 Offline html explorer for the open Chinese English Dictionary started by Paul Denisowski
 
 ## Use online
-https://mqnc.github.io/cedictexplorer/template.html (13MB)
+https://mqnc.github.io/cedictexplorer/cedict_explorer_online.html (13MB)
 
 (this version links a js file with the dictionary which should get cached by the browser)
 
 ## Use offline
-All you need is the generated cedict_explorer.html which you can download here:
+All you need is the generated cedict_explorer_offline.html which you can download here:
 
-https://mqnc.github.io/cedictexplorer/cedict_explorer.html (13MB)
+https://mqnc.github.io/cedictexplorer/cedict_explorer_offline.html (13MB)
 
 If you want to use the calligraphic version as well, you also need the font:
 

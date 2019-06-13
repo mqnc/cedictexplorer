@@ -89,7 +89,7 @@ for l in lines:
 			end-=1
 
 	# remove split marks between traditional and simplified
-	meanings = meanings.replace("|", "")
+	# meanings = meanings.replace("|", "")
 
 	# turn into json list
 	meanings = "['" + meanings.replace("/", "', '") + "']"
@@ -114,7 +114,7 @@ with open('cedict.js','w') as file:
 	file.write(js)
 
 # read html template
-with open('template.html','r') as file:
+with open('cedict_explorer_online.html','r') as file:
 	html = file.read()
 
 html = html.replace(
@@ -122,5 +122,5 @@ html = html.replace(
 		"<script>\n" + js + "\n</script>")
 
 # write to html file
-with open('cedict_explorer.html','w') as file:
+with open('cedict_explorer_offline.html','w') as file:
 	file.write(html)
